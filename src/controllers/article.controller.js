@@ -94,3 +94,23 @@ exports.update = (req, res) => {
       });
     });
 };
+
+exports.delete = (req, res) => {
+  const id = req.params.id;
+
+  Article.findByIdAndRemove(id, { useFindAndModify: false })
+    .then((data) => {
+      if (!data) {
+        res.status(404).send({
+          message: `Tidak dapat menghapus artikel dengan id ${id}!`,
+        });
+      } else {
+        res.send({ message: "Artikel berhasil dihapus!" });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || `Gagal saat menghapus artikel dengan id ${id}!`,
+      });
+    });
+};

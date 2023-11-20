@@ -8,6 +8,8 @@ module.exports = (app) => {
 
   router.put("/:id", article.update);
 
+  router.delete("/:id", article.delete);
+
   router.post("/", article.create);
 
   app.use("/api/article", router);
