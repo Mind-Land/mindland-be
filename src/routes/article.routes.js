@@ -2,9 +2,7 @@ module.exports = (app) => {
   const article = require("../controllers/article.controller.js");
   const router = require("express").Router();
 
-  router.get("/", (req, res) => {
-    res.json("This is articles route");
-  });
+  router.get("/", article.findAll);
 
   router.get("/:id", (req, res) => {
     res.json(req.params.id);

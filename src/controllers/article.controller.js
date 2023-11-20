@@ -31,3 +31,20 @@ exports.create = (req, res) => {
       });
     });
 };
+
+exports.findAll = (req, res) => {
+  const title = req.query.search;
+  const query = title
+    ? { title: { $regex: new RegExp(title), $options: "i" } }
+    : {};
+
+  Article.find(query)
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "Terjadi kesalahan saat mengambil artikel!",
+      });
+    });
+};
