@@ -68,3 +68,29 @@ exports.findOne = (req, res) => {
       });
     });
 };
+
+exports.update = (req, res) => {
+  if (!req.body) {
+    return res.status(400).send({
+      message: "Data yang akan diubah tidak boleh kosong!",
+    });
+  }
+
+  const id = req.params.id;
+
+  Article.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+    .then((data) => {
+      if (!data) {
+        res.status(404).send({
+          message: `Tidak dapat mengubah artikel dengan id ${id}!`,
+        });
+      } else {
+        res.send({ message: "Artikel berhasil diubah!" });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || `Gagal saat mengubah artikel dengan id ${id}!`,
+      });
+    });
+};
