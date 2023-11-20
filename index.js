@@ -15,13 +15,13 @@ const db = require("./src/models");
 // const articlesRouter = require("./src/routes/article.routes");
 // const authRouter = require("./src/routes/auth");
 
-app.use(cors(corsOption));
 app.use(express.json());
+app.use(cors(corsOption));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 db.mongoose
-  .connect(db.url)
+  .connect(db.url, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log("Successfully connected to the database!");
   })

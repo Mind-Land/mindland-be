@@ -1,10 +1,10 @@
 # Mind-Land Back-End
 This app was build for Mind Land's backend.
 
-## How to run on local
+## How to Run on Local
 Clone this repository (branch - PunyaYanuar)
 ```
-git clone -b PunyaYanuar https://github.com/OnyanPokon/Mind-Land.git
+git clone -b PunyaYanuar https://github.com/OnyanPokon/Mind-Land.git yourfoldername
 ```
 Go to the root of folder
 ```

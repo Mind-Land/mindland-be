@@ -3,15 +3,15 @@ module.exports = (mongoose) => {
     {
       title: String,
       author: String,
-      date: Date,
       imageUrl: String,
+      content: String,
     },
     { timestamps: true }
   );
 
   schema.method("toJSON", function () {
     const { __v, __id, ...object } = this.toObject();
-    object.id = _id;
+    object.id = __id;
     return object;
   });
 

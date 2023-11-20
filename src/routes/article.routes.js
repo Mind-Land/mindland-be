@@ -1,4 +1,5 @@
 module.exports = (app) => {
+  const article = require("../controllers/article.controller.js");
   const router = require("express").Router();
 
   router.get("/", (req, res) => {
@@ -9,9 +10,7 @@ module.exports = (app) => {
     res.json(req.params.id);
   });
 
-  router.post("/", (req, res) => {
-    res.json(req.body);
-  });
+  router.post("/", article.create);
 
   app.use("/api/article", router);
 };
