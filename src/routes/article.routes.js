@@ -4,9 +4,7 @@ module.exports = (app) => {
 
   router.get("/", article.findAll);
 
-  router.get("/:id", (req, res) => {
-    res.json(req.params.id);
-  });
+  router.get("/:id", article.findOne);
 
   router.post("/", article.create);
 
