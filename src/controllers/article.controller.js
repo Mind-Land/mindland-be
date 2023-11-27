@@ -20,8 +20,7 @@ exports.create = (req, res) => {
     content: req.body.content,
   });
 
-  article
-    .save(article)
+  Article.save(article)
     .then((data) => {
       res.send(data);
     })

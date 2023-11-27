@@ -1,10 +1,10 @@
 module.exports = (mongoose) => {
   const schema = mongoose.Schema(
     {
-      title: String,
-      author: String,
+      title: { type: String, required: true },
+      author: { type: String, required: true },
       imageUrl: String,
-      content: String,
+      content: { type: String, required: true },
     },
     { timestamps: true }
   );

@@ -10,11 +10,6 @@ const corsOption = {
 
 const db = require("./src/models");
 
-// const indexRouter = require("./src/routes/index");
-// const usersRouter = require("./src/routes/users");
-// const articlesRouter = require("./src/routes/article.routes");
-// const authRouter = require("./src/routes/auth");
-
 app.use(express.json());
 app.use(cors(corsOption));
 app.use(express.urlencoded({ extended: false }));
@@ -32,6 +27,7 @@ db.mongoose
 
 require("./src/routes/index.routes")(app);
 require("./src/routes/article.routes")(app);
+require("./src/routes/auth.routes")(app);
 
 app.listen(port, () => {
   console.log(`Running on port http://localhost:${port}`);
