@@ -36,10 +36,18 @@ exports.register = (req, res) => {
     });
 };
 
-exports.login = (req, res) => {
+exports.login = async (req, res) => {
   const { email, password } = req.body;
 
-  res.json({ email, password });
+  try {
+    const user = await User.login(email, password);
+    const token = createToken(user._id);
+    res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
+    res.status(200).json({ message: "Berhasil login!" });
+  } catch (err) {
+    const errors = errorHandler(err);
+    res.status(400).json({ errors });
+  }
 };
 
 exports.logout = (req, res) => {

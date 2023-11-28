@@ -1,6 +1,16 @@
 const errorHandler = (err) => {
   let errors = { username: "", email: "", password: "" };
 
+  if (err.message === "Email belum terdaftar!") {
+    errors.email = err.message;
+    return errors;
+  }
+
+  if (err.message === "Password salah!") {
+    errors.password = err.message;
+    return errors;
+  }
+
   if (err.code === 11000 && err.keyValue.username) {
     errors.username = `Username ${err.keyValue.username} sudah digunakan!`;
     return errors;

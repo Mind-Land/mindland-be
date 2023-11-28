@@ -38,6 +38,16 @@ module.exports = (mongoose) => {
     next();
   });
 
+  schema.statics.login = async function (email, password) {
+    const user = await this.findOne({ email });
+    if (user) {
+      const auth = await brcypt.compare(password, user.password);
+      if (auth) return user;
+      throw Error("Password salah!");
+    }
+    throw Error("Email belum terdaftar!");
+  };
+
   const User = mongoose.model("user", schema);
 
   return User;
