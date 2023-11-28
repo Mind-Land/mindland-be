@@ -1,6 +1,14 @@
 const db = require("../models");
 const User = db.user;
 const errorHandler = require("../helpers/errorHandler");
+const jwt = require("jsonwebtoken");
+
+const maxAge = 3 * 24 * 60 * 60;
+const createToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: maxAge,
+  });
+};
 
 exports.register = (req, res) => {
   const { username, email, password } = req.body;
@@ -17,7 +25,9 @@ exports.register = (req, res) => {
   });
 
   User.create(user)
-    .then(() => {
+    .then((data) => {
+      const token = createToken(data._id);
+      res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
       res.json({ message: "User berhasil dibuat!" });
     })
     .catch((err) => {
