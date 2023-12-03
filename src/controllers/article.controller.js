@@ -1,10 +1,13 @@
 const db = require("../models");
 const Article = db.article;
 
+const getPagination = require("../helpers/getPagination");
+
 exports.create = (req, res) => {
   // Validasi
   if (
     !req.body.title &&
+    !req.body.category &&
     !req.body.author &&
     !req.body.content &&
     !req.body.imageUrl
@@ -32,14 +35,22 @@ exports.create = (req, res) => {
 };
 
 exports.findAll = (req, res) => {
-  const title = req.query.search;
+  const { page, size, title } = req.query;
+
   const query = title
     ? { title: { $regex: new RegExp(title), $options: "i" } }
     : {};
 
-  Article.find(query)
+  const { limit, offset } = getPagination(page, size);
+
+  Article.paginate(query, { offset, limit })
     .then((data) => {
-      res.send(data);
+      res.send({
+        totalItems: data.totalDocs,
+        results: data.docs,
+        totalPages: data.totalPages,
+        currentPage: data.page,
+      });
     })
     .catch((err) => {
       res.status(500).send({
