@@ -1,5 +1,6 @@
 const db = require("../models");
 const Article = db.article;
+const slugify = require("slugify");
 
 const getPagination = require("../helpers/getPagination");
 
@@ -10,20 +11,36 @@ exports.create = (req, res) => {
     !req.body.category &&
     !req.body.author &&
     !req.body.content &&
-    !req.body.imageUrl
+    !req.body.imageUrl &&
+    !req.body.isPublished &&
+    !req.body.summary
   ) {
     res.status(400).send({ message: "Semua field harus terisi!" });
     return;
   }
 
+  if (req.user.roles !== "doctor" && req.user.roles !== "admin") {
+    res.status(401).send({ message: "Unauthorized!" });
+    return;
+  }
+
   const article = new Article({
     title: req.body.title,
+    slug: slugify(req.body.title, {
+      lower: true,
+      replacement: "-",
+      remove: /[*+~.()'"!:@?,]/g,
+    }),
     author: req.body.author,
+    summary: req.body.summary,
     imageUrl: req.body.imageUrl,
-    content: req.body.content,
+    body: req.body.content,
+    published: req.body.published,
+    category: req.body.category,
+    hit: Math.floor(Math.random() * 100),
   });
 
-  Article.save(article)
+  Article.create(article)
     .then((data) => {
       res.send(data);
     })
@@ -34,20 +51,42 @@ exports.create = (req, res) => {
     });
 };
 
-exports.findAll = (req, res) => {
-  const { page, size, title } = req.query;
+exports.findAll = async (req, res, next) => {
+  const { page = 1, size, title, author } = req.query;
 
-  const query = title
-    ? { title: { $regex: new RegExp(title), $options: "i" } }
-    : {};
+  // const query = title
+  //   ? { title: { $regex: new RegExp(title), $options: "i" } }
+  //   : {};
 
-  const { limit, offset } = getPagination(page, size);
+  const query = {
+    title: { $regex: new RegExp(title), $options: "i" }, // Case-insensitive regex for title search
+    published: true,
+    author: { $regex: new RegExp(author), $options: "i" },
+  };
 
-  Article.paginate(query, { offset, limit })
+  const options = {
+    page,
+    limit: 6,
+    collation: {
+      locale: "en",
+    },
+  };
+
+  Article.paginate(query, options)
     .then((data) => {
       res.send({
         totalItems: data.totalDocs,
-        results: data.docs,
+        results: data.docs.map((article) => {
+          return {
+            id: article._id,
+            title: article.title,
+            author: article.author,
+            imageUrl: article.imageUrl,
+            summary: article.summary,
+            slug: article.slug,
+            timestamp: article.createdAt,
+          };
+        }),
         totalPages: data.totalPages,
         currentPage: data.page,
       });
@@ -60,14 +99,15 @@ exports.findAll = (req, res) => {
 };
 
 exports.findOne = (req, res) => {
-  const id = req.params.id;
+  // const id = req.params.id;
+  const slug = req.params.slug;
 
-  Article.findById(id)
+  Article.findOne({ slug: slug })
     .then((data) => {
       if (!data)
         res
           .status(404)
-          .send({ message: `Artikel dengan id ${id} tidak ditemukan!` });
+          .send({ message: `Artikel dengan id ${slug} tidak ditemukan!` });
       else res.send(data);
     })
     .catch((err) => {
@@ -78,6 +118,10 @@ exports.findOne = (req, res) => {
       });
     });
 };
+
+exports.findAllUnlisted = (req, res) => {};
+
+exports.findById = (req, res) => {};
 
 exports.update = (req, res) => {
   if (!req.body) {

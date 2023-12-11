@@ -1,14 +1,17 @@
 module.exports = (mongoose, mongoosePaginate) => {
   const schema = mongoose.Schema(
     {
-      title: { type: String, required: true },
-      category: { type: Array, default: [] },
+      title: { type: String, required: true, unique: true },
+      slug: { type: String, required: true, unique: true },
+      category: { type: mongoose.Schema.Types.ObjectId, ref: "category" },
       author: { type: String, required: true },
-      summary: String,
+      summary: { type: String, required: true },
+      published: { type: Boolean, required: true },
       body: { type: String, required: true },
       hit: { type: Number, default: 0 },
       imageUrl: String,
-      reference: { type: Array, default: [] },
+      reference: { type: mongoose.Schema.Types.ObjectId },
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
     },
     { timestamps: true }
   );
