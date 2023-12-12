@@ -53,9 +53,9 @@ exports.findAll = async (req, res) => {
   const { page = 1, title, author } = req.query;
 
   const query = {
-    title: { $regex: new RegExp(title), $options: "i" }, // Case-insensitive regex for title search
+    title: { $regex: new RegExp(title), $options: "i" },
     published: true,
-    author: { $regex: new RegExp(author), $options: "i" },
+    // author: author,
   };
 
   const options = {
