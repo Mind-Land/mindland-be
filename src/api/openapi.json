@@ -1,0 +1,133 @@
+{
+  "openapi": "3.1.0",
+  "host": "http://localhost:5000",
+  "basePath": "/api",
+  "info": {
+    "title": "Mindland API",
+    "version": "1.0.0",
+    "description": "Mindland's backend application made with Express and documented with Swagger",
+    "license": {
+      "name": "MIT",
+      "url": "https://spdx.org/licenses/MIT.html"
+    },
+    "contact": {
+      "name": "Yanuar",
+      "url": "https://github.com/yanuarfa"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "auth",
+      "description": "About authentication of user"
+    },
+    {
+      "name": "article",
+      "description": "Access article"
+    },
+    {
+      "name": "doctor",
+      "description": "About doctor"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Register new user",
+        "operationId": "registerUser",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "body": {
+          "description": "User object that needs to be added to the database",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Login user"
+      }
+    },
+    "/article": {
+      "get": {
+        "tags": ["article"],
+        "summary": "Get all articles"
+      },
+      "post": {
+        "tags": ["article"],
+        "summary": "Create new article"
+      }
+    },
+    "/article/{articleSlug}": {
+      "get": {
+        "tags": ["article"],
+        "summary": "Get article by slug"
+      }
+    },
+    "/article/{articleId}": {
+      "put": {
+        "tags": ["article"],
+        "summary": "Update article"
+      },
+      "delete": {
+        "tags": ["article"],
+        "summary": "Delete article"
+      }
+    },
+    "/article/unlisted": {
+      "get": {
+        "tags": ["article"],
+        "summary": "Get all unlisted articles"
+      }
+    },
+    "/doctor": {
+      "get": {
+        "tags": ["doctor"],
+        "summary": "Get all doctors"
+      }
+    },
+    "/doctor/{doctorId}": {
+      "get": {
+        "tags": ["doctor"],
+        "summary": "Get doctor by id"
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

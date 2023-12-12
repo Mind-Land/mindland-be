@@ -1,4 +1,4 @@
-module.exports = (mongoose) => {
+module.exports = (mongoose, mongoosePaginate) => {
   const validator = require("validator");
   const brcypt = require("bcryptjs");
 
@@ -29,6 +29,14 @@ module.exports = (mongoose) => {
         type: String,
         default: "https://i.ibb.co/4m3QJ0t/default-avatar.png",
       },
+      firstName: {
+        type: String,
+        default: "",
+      },
+      lastName: {
+        type: String,
+        default: "",
+      },
       name: {
         type: String,
         default: "",
@@ -42,6 +50,7 @@ module.exports = (mongoose) => {
       alumnus: { type: String, default: "" },
       rating: { type: mongoose.Schema.Types.ObjectId, ref: "rating" },
       followers: { type: Number, default: 0 },
+      article: [{ type: mongoose.Schema.Types.ObjectId, ref: "article" }],
     },
     {
       timestamps: true,
@@ -108,6 +117,8 @@ module.exports = (mongoose) => {
     }
     throw Error("Username / email belum terdaftar!");
   };
+
+  schema.plugin(mongoosePaginate);
 
   const User = mongoose.model("user", schema);
 

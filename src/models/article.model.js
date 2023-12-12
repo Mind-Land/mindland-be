@@ -4,7 +4,7 @@ module.exports = (mongoose, mongoosePaginate) => {
       title: { type: String, required: true, unique: true },
       slug: { type: String, required: true, unique: true },
       category: { type: mongoose.Schema.Types.ObjectId, ref: "category" },
-      author: { type: String, required: true },
+      author: { type: mongoose.Types.ObjectId, ref: "user" },
       summary: { type: String, required: true },
       published: { type: Boolean, required: true },
       body: { type: String, required: true },

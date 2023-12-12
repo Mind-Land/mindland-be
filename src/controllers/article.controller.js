@@ -2,14 +2,12 @@ const db = require("../models");
 const Article = db.article;
 const slugify = require("slugify");
 
-const getPagination = require("../helpers/getPagination");
-
 exports.create = (req, res) => {
   // Validasi
   if (
     !req.body.title &&
     !req.body.category &&
-    !req.body.author &&
+    // !req.body.author &&
     !req.body.content &&
     !req.body.imageUrl &&
     !req.body.isPublished &&
@@ -31,7 +29,7 @@ exports.create = (req, res) => {
       replacement: "-",
       remove: /[*+~.()'"!:@?,]/g,
     }),
-    author: req.body.author,
+    author: req.user.id,
     summary: req.body.summary,
     imageUrl: req.body.imageUrl,
     body: req.body.content,
@@ -51,12 +49,8 @@ exports.create = (req, res) => {
     });
 };
 
-exports.findAll = async (req, res, next) => {
-  const { page = 1, size, title, author } = req.query;
-
-  // const query = title
-  //   ? { title: { $regex: new RegExp(title), $options: "i" } }
-  //   : {};
+exports.findAll = async (req, res) => {
+  const { page = 1, title, author } = req.query;
 
   const query = {
     title: { $regex: new RegExp(title), $options: "i" }, // Case-insensitive regex for title search
@@ -99,10 +93,33 @@ exports.findAll = async (req, res, next) => {
 };
 
 exports.findOne = (req, res) => {
-  // const id = req.params.id;
   const slug = req.params.slug;
 
   Article.findOne({ slug: slug })
+    .then((data) => {
+      if (!data)
+        res
+          .status(404)
+          .send({ message: `Artikel dengan slug ${slug} tidak ditemukan!` });
+      else res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message ||
+          `Terjadi kesalahan saat mengambil artikel dengan slug ${id}!`,
+      });
+    });
+};
+
+exports.findAllUnlisted = (req, res) => {};
+
+exports.findById = (req, res) => {
+  const id = req.params.id;
+
+  console.log(id);
+
+  Article.findById(id)
     .then((data) => {
       if (!data)
         res
@@ -118,10 +135,6 @@ exports.findOne = (req, res) => {
       });
     });
 };
-
-exports.findAllUnlisted = (req, res) => {};
-
-exports.findById = (req, res) => {};
 
 exports.update = (req, res) => {
   if (!req.body) {

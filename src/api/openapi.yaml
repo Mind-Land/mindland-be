@@ -1,0 +1,261 @@
+openapi: '3.0.2'
+info:
+  title: Mindland API
+  version: '1.0'
+  description: Mindland's backend application made with Express and documented with Swagger
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
+  contact:
+    name: Yanuar
+    url: 'https://github.com/yanuarfa'
+servers:
+  - url: http://localhost:5000/api
+tags:
+  - name: auth
+    description: User authentication
+  - name: article
+    description: Access articles
+  - name: doctor
+    description: About doctors 
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  required: 
+                    - "string"
+                  description: Username must be unique
+                email:
+                  type: string
+                  required: 
+                    - "string"
+                  description: Email must be unique
+                password:
+                  type: string
+                  required: 
+                    - "string"
+                  description: Password must be strong contains uppercase, lowercase, number, and special character
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /auth/login:
+    post:
+      summary: Login user
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user: 
+                  type: string
+                  required: 
+                    - "string"
+                  description: You can use either username or email
+                password:
+                  type: string
+                  required: 
+                    - "string"
+                  description: Password must be strong contains uppercase, lowercase, number, and special character
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /article:
+    get:
+      summary: Get all articles
+      tags:
+        - article
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+    post:
+      summary: Create new article
+      tags:
+        - article
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  required: 
+                    - "string"
+                author:
+                  type: string
+                  required: 
+                    - "string"
+                content:
+                  type: string
+                  required: 
+                    - "string"
+                imageUrl:
+                  type: string
+                  required: 
+                    - "string"
+                published:
+                  type: boolean
+                  required: 
+                    - "boolean"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /article/{articleSlug}:
+    get:
+      summary: Get article by slug
+      tags:
+        - article
+      parameters:
+        - name: slug
+          in: path
+          description: Article slug
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /article/{articleId}:
+    put:
+      summary: Update article by id
+      tags:
+        - article
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Article id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    delete:
+      summary: Delete article by id
+      tags:
+        - article
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Article id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /article/unlisted:
+    get:
+      summary: Get all unlisted articles
+      tags:
+        - article
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /article/id/{articleId}:
+    get:
+      summary: Get article by id
+      tags:
+        - article
+      parameters:
+        - name: id
+          in: path
+          description: Article id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+
+components:
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
