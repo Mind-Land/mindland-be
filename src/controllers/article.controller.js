@@ -61,8 +61,6 @@ exports.create = async (req, res) => {
 exports.findAll = async (req, res) => {
   const { page = 1, title, popular = 0, category } = req.query;
 
-  // console.log(title, popular, category);
-
   const query = {
     title: { $regex: new RegExp(title), $options: "i" },
     hit: popular ? { $gte: popular } : { $gte: 0 },
@@ -133,8 +131,6 @@ exports.findOne = (req, res) => {
 
 exports.findById = (req, res) => {
   const id = req.params.id;
-
-  // console.log(id);
 
   Article.findById(id)
     .populate("author", "fullName avatar -_id")

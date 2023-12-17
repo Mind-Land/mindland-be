@@ -13,8 +13,6 @@ const createToken = (id) => {
 exports.register = async (req, res) => {
   const { username, email, password } = req.body;
 
-  console.log(username, email, password);
-
   try {
     const user = await User.register(username, email, password);
 
@@ -35,8 +33,6 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   const { user: identifier, password } = req.body;
-
-  console.log(identifier, password);
 
   try {
     const user = await User.login(identifier, password);

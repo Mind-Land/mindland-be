@@ -16,8 +16,6 @@ exports.findAll = async (req, res) => {
     },
   };
 
-  // console.log(query);
-
   Doctor.paginate(query, options)
     .then((data) => {
       res.send({
@@ -60,7 +58,7 @@ exports.findById = async (req, res) => {
 };
 
 exports.update = (req, res) => {
-  if (!req.body) {
+  if (!req.body.length > 0) {
     return res.status(400).send({
       message: "Data yang akan diubah tidak boleh kosong!",
     });
@@ -70,7 +68,6 @@ exports.update = (req, res) => {
 
   Doctor.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
     .then((data) => {
-      console.log(data);
       if (!data) {
         res.status(404).send({
           message: `Tidak dapat mengubah detail doctor dengan id ${id}!`,

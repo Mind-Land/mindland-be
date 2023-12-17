@@ -16,7 +16,13 @@ const requireAuth = async (req, res, next) => {
   try {
     const { id } = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = await User.findOne({ _id: id }).select("id roles");
+    const user = await User.findOne({ _id: id }).select("id roles");
+
+    if (!user) {
+      res.status(401).json({ error: "Unauthorized!" });
+    }
+
+    req.user = user;
     next();
   } catch (err) {
     console.log(err);
@@ -37,6 +43,10 @@ const requireDoctor = async (req, res, next) => {
     const { id } = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await Doctor.findOne({ _id: id }).select("id roles");
+
+    if (!user) {
+      res.status(401).json({ error: "Unauthorized!" });
+    }
 
     if (!user.roles === "doctor") {
       return res.status(401).json({ error: "Unauthorized!" });

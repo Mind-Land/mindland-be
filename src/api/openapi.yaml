@@ -18,6 +18,8 @@ tags:
     description: Access articles
   - name: doctor
     description: About doctors 
+  - name: user
+    description: About users
 paths:
   /auth/register:
     post:
@@ -68,6 +70,77 @@ paths:
                   required: 
                     - "string"
                   description: You can use either username or email
+                password:
+                  type: string
+                  required: 
+                    - "string"
+                  description: Password must be strong contains uppercase, lowercase, number, and special character
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /auth/doctor-register:
+    post:
+      summary: Register new doctor
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  required: 
+                    - "string"
+                  description: Email must be unique
+                password:
+                  type: string
+                  required: 
+                    - "string"
+                  description: Password must be strong contains uppercase, lowercase, number, and special character
+                firstName:
+                  type: string
+                  required: 
+                    - "string"
+                  description: First name
+                lastName:
+                  type: string
+                  required: 
+                    - "string"
+                  description: Last name
+                jenisKelamin:
+                  type: string
+                  required: 
+                    - "string"
+                  description: Jenis kelamin
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /auth/doctor-login:
+    post:
+      summary: Login doctor
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: 
+                  type: string
+                  required: 
+                    - "string"
+                  description: You should use email
                 password:
                   type: string
                   required: 
@@ -205,30 +278,6 @@ paths:
           description: Internal server error
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-  /article/unlisted:
-    get:
-      summary: Get all unlisted articles
-      tags:
-        - article
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: page
-          in: query
-          description: Page number
-          required: false
-          schema:
-            type: integer
-            default: 1
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Bad request
-        '500':
-          description: Internal server error
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
   /article/id/{articleId}:
     get:
       summary: Get article by id
@@ -248,6 +297,148 @@ paths:
           description: Bad request
         '500':
           description: Internal server error
+  /article/user/{userId}:
+    get:
+      summary: Get article by user id
+      tags:
+        - article
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: user id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /doctor:
+    get:
+      summary: Get all doctors
+      parameters:
+        - name: search
+          in: query
+          description: Search doctor by name
+          required: false
+          schema:
+            type: string
+      tags:
+        - doctor
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /doctor/{articleId}:
+    get:
+      summary: Get doctor by id
+      tags:
+        - doctor
+      parameters:
+        - name: id
+          in: path
+          description: Doctor id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+    put:
+      summary: Update doctor by id
+      tags:
+        - doctor
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  example: John
+                lastName:
+                  type: string
+                  example: Doe
+                jenisKelamin:
+                  type: string
+                  example: Laki-laki
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /user/{userId}:
+    get:
+      summary: Get user by id
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          description: User id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+    put:
+      summary: Update user by id
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: User id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                  example: John Doe
+                username:
+                  type: string
+                  example: johndoe
+                jenisKelamin:
+                  type: string
+                  example: Laki-laki
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
 
 
 components:

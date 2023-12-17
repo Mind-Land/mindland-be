@@ -30,6 +30,7 @@ db.mongoose
 require("./src/routes/index.routes")(app);
 require("./src/routes/article.routes")(app);
 require("./src/routes/doctor.routes")(app);
+require("./src/routes/user.routes")(app);
 require("./src/routes/auth.routes")(app);
 
 app.listen(port, () => {
