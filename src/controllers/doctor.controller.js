@@ -58,7 +58,7 @@ exports.findById = async (req, res) => {
 };
 
 exports.update = (req, res) => {
-  if (!req.body.length > 0) {
+  if (!req.body) {
     return res.status(400).send({
       message: "Data yang akan diubah tidak boleh kosong!",
     });
