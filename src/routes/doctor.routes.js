@@ -4,6 +4,7 @@ module.exports = (app) => {
 
   router.get("/", doctor.findAll);
   router.get("/:id", doctor.findById);
+  router.put("/:id", doctor.update);
 
   app.use("/api/doctor", router);
 };

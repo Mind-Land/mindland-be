@@ -3,9 +3,9 @@ module.exports = (app) => {
   const router = require("express").Router();
   const { requireDoctor } = require("../middleware/requireAuth.js");
 
-  router.get("/unlisted", requireDoctor, article.findAllUnlisted);
   router.get("/", article.findAll);
   router.get("/id/:id", article.findById);
+  router.get("/user/:id", requireDoctor, article.findArticleByUser);
   router.get("/:slug", article.findOne);
   router.put("/:id", requireDoctor, article.update);
   router.delete("/:id", requireDoctor, article.delete);

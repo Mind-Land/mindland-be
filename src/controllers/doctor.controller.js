@@ -1,12 +1,11 @@
 const db = require("../models");
-const User = db.user;
+const Doctor = db.doctor;
 
 exports.findAll = async (req, res) => {
   const { page = 1, search } = req.query;
 
   const query = {
-    // name: { $regex: new RegExp(search), $options: "i" },
-    roles: "doctor",
+    fullName: { $regex: new RegExp(search), $options: "i" },
   };
 
   const options = {
@@ -17,16 +16,20 @@ exports.findAll = async (req, res) => {
     },
   };
 
-  User.paginate(query, options)
+  // console.log(query);
+
+  Doctor.paginate(query, options)
     .then((data) => {
       res.send({
         totalItems: data.totalDocs,
         results: data.docs.map((doctor) => {
           return {
             id: doctor._id,
-            name: doctor.name,
+            name: doctor.fullName,
             avatar: doctor.avatar,
-            praktik: doctor.praktik,
+            pengalaman: doctor.pengalaman,
+            followers: doctor.followers,
+            job: doctor.job,
           };
         }),
         totalPages: data.totalPages,
@@ -43,8 +46,7 @@ exports.findAll = async (req, res) => {
 exports.findById = async (req, res) => {
   const id = req.params.id;
 
-  User.findById(id)
-    .where({ roles: "doctor" })
+  Doctor.findById(id)
     .select("-password -__v")
     .then((data) => {
       if (!data) res.status(404).send({ message: "Dokter tidak ditemukan!" });
@@ -54,5 +56,33 @@ exports.findById = async (req, res) => {
       res
         .status(500)
         .send({ message: "Terjadi kesalahan saat mengambil data dokter!" });
+    });
+};
+
+exports.update = (req, res) => {
+  if (!req.body) {
+    return res.status(400).send({
+      message: "Data yang akan diubah tidak boleh kosong!",
+    });
+  }
+
+  const { id } = req.params;
+
+  Doctor.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+    .then((data) => {
+      console.log(data);
+      if (!data) {
+        res.status(404).send({
+          message: `Tidak dapat mengubah detail doctor dengan id ${id}!`,
+        });
+      } else {
+        res.send({ message: "Detail doctor berhasil diubah!" });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || `Gagal saat mengubah detail doctor dengan id ${id}!`,
+      });
     });
 };

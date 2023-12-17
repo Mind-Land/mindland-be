@@ -1,25 +1,35 @@
 const db = require("../models");
 const Article = db.article;
 const slugify = require("slugify");
+const { cloudinary } = require("../utils/cloudinary");
 
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   // Validasi
   if (
     !req.body.title &&
     !req.body.category &&
-    // !req.body.author &&
     !req.body.content &&
     !req.body.imageUrl &&
-    !req.body.isPublished &&
     !req.body.summary
   ) {
     res.status(400).send({ message: "Semua field harus terisi!" });
     return;
   }
 
-  if (req.user.roles !== "doctor" && req.user.roles !== "admin") {
+  if (!req.user.roles === "doctor") {
     res.status(401).send({ message: "Unauthorized!" });
     return;
+  }
+
+  try {
+    const imageFile = req.body.imageUrl;
+    const uploadedResponse = await cloudinary.uploader.upload(imageFile, {
+      upload_preset: "mindland",
+    });
+
+    req.body.imageUrl = uploadedResponse.url;
+  } catch (error) {
+    console.log(error);
   }
 
   const article = new Article({
@@ -33,7 +43,6 @@ exports.create = (req, res) => {
     summary: req.body.summary,
     imageUrl: req.body.imageUrl,
     body: req.body.content,
-    published: req.body.published,
     category: req.body.category,
     hit: Math.floor(Math.random() * 100),
   });
@@ -50,16 +59,23 @@ exports.create = (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page = 1, title, author } = req.query;
+  const { page = 1, title, popular = 0, category } = req.query;
+
+  // console.log(title, popular, category);
 
   const query = {
     title: { $regex: new RegExp(title), $options: "i" },
-    published: true,
-    // author: author,
+    hit: popular ? { $gte: popular } : { $gte: 0 },
+    category: { $regex: new RegExp(category), $options: "i" },
   };
 
   const options = {
+    sort: { createdAt: -1 },
     page,
+    populate: {
+      path: "author",
+      select: "fullName avatar -_id",
+    },
     limit: 6,
     collation: {
       locale: "en",
@@ -77,8 +93,10 @@ exports.findAll = async (req, res) => {
             author: article.author,
             imageUrl: article.imageUrl,
             summary: article.summary,
+            category: article.category,
             slug: article.slug,
             timestamp: article.createdAt,
+            hit: article.hit,
           };
         }),
         totalPages: data.totalPages,
@@ -96,6 +114,7 @@ exports.findOne = (req, res) => {
   const slug = req.params.slug;
 
   Article.findOne({ slug: slug })
+    .populate("author", "fullName avatar job pengalaman -_id")
     .then((data) => {
       if (!data)
         res
@@ -112,14 +131,13 @@ exports.findOne = (req, res) => {
     });
 };
 
-exports.findAllUnlisted = (req, res) => {};
-
 exports.findById = (req, res) => {
   const id = req.params.id;
 
-  console.log(id);
+  // console.log(id);
 
   Article.findById(id)
+    .populate("author", "fullName avatar -_id")
     .then((data) => {
       if (!data)
         res
@@ -137,6 +155,11 @@ exports.findById = (req, res) => {
 };
 
 exports.update = (req, res) => {
+  if (!req.user.id) {
+    res.status(401).send({ message: "Unauthorized!" });
+    return;
+  }
+
   if (!req.body) {
     return res.status(400).send({
       message: "Data yang akan diubah tidak boleh kosong!",
@@ -165,6 +188,17 @@ exports.update = (req, res) => {
 exports.delete = (req, res) => {
   const id = req.params.id;
 
+  if (!id) {
+    return res.status(400).send({
+      message: "Id tidak boleh kosong!",
+    });
+  }
+
+  if (!req.user.id) {
+    res.status(401).send({ message: "Unauthorized!" });
+    return;
+  }
+
   Article.findByIdAndRemove(id, { useFindAndModify: false })
     .then((data) => {
       if (!data) {
@@ -178,6 +212,33 @@ exports.delete = (req, res) => {
     .catch((err) => {
       res.status(500).send({
         message: err.message || `Gagal saat menghapus artikel dengan id ${id}!`,
+      });
+    });
+};
+
+exports.findArticleByUser = (req, res) => {
+  const id = req.params.id;
+
+  if (!req.user.id === id) {
+    res.status(401).send({ message: "Unauthorized!" });
+    return;
+  }
+
+  Article.find({ author: id })
+    .populate("author", "fullName avatar -_id")
+    .then((data) => {
+      // console.log(data);
+      if (!data)
+        res
+          .status(404)
+          .send({ message: `Artikel dengan userID ${id} tidak ditemukan!` });
+      else res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message ||
+          `Terjadi kesalahan saat mengambil artikel dengan userID${id}!`,
       });
     });
 };

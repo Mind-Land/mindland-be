@@ -13,44 +13,23 @@ module.exports = (mongoose, mongoosePaginate) => {
         type: String,
         required: [true, "Email tidak boleh kosong!"],
         unique: [true, "Email sudah digunakan!"],
-        // validate: [isEmail, "Email tidak valid!"],
+        validate: [validator.isEmail, "Email tidak valid!"],
+      },
+      fullName: {
+        type: String,
+        default: "",
       },
       password: {
         type: String,
         required: [true, "Password tidak boleh kosong!"],
         minLength: [8, "Password minimal 8 karakter!"],
       },
-      roles: {
-        type: String,
-        enum: ["user", "doctor", "admin"],
-        default: "user",
-      },
       avatar: {
         type: String,
-        default: "https://i.ibb.co/4m3QJ0t/default-avatar.png",
+        default:
+          "https://www.repol.copl.ulaval.ca/wp-content/uploads/2019/01/default-user-icon.jpg",
       },
-      firstName: {
-        type: String,
-        default: "",
-      },
-      lastName: {
-        type: String,
-        default: "",
-      },
-      name: {
-        type: String,
-        default: "",
-      },
-      praktik: {
-        type: String,
-        default: "",
-      },
-      pengalaman: { type: Number, default: 0 },
-      job: { type: String, default: "" },
-      alumnus: { type: String, default: "" },
-      rating: { type: mongoose.Schema.Types.ObjectId, ref: "rating" },
-      followers: { type: Number, default: 0 },
-      article: [{ type: mongoose.Schema.Types.ObjectId, ref: "article" }],
+      roles: { type: String, default: "user" },
     },
     {
       timestamps: true,

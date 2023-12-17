@@ -10,6 +10,7 @@ db.mongoose = mongoose;
 db.url = dbConfig.url;
 
 db.user = require("./user.model.js")(mongoose, mongoosePaginate);
+db.doctor = require("./doctor.model.js")(mongoose, mongoosePaginate);
 db.category = require("./category.model.js")(mongoose);
 db.article = require("./article.model.js")(mongoose, mongoosePaginate);
 
