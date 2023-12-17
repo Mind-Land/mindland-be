@@ -1,10 +1,14 @@
-module.exports = (mongoose) => {
+module.exports = (mongoose, mongoosePaginate) => {
   const schema = mongoose.Schema(
     {
-      title: String,
-      author: String,
+      title: { type: String, required: true, unique: true },
+      slug: { type: String, required: true, unique: true },
+      category: { type: String, required: true },
+      author: { type: mongoose.Types.ObjectId, ref: "doctor" },
+      summary: { type: String, required: true },
+      body: { type: String, required: true },
+      hit: { type: Number, default: 0 },
       imageUrl: String,
-      content: String,
     },
     { timestamps: true }
   );
@@ -14,6 +18,8 @@ module.exports = (mongoose) => {
     object.id = _id;
     return object;
   });
+
+  schema.plugin(mongoosePaginate);
 
   const Article = mongoose.model("article", schema);
   return Article;
