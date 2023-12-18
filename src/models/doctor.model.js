@@ -39,7 +39,7 @@ module.exports = (mongoose, mongoosePaginate) => {
         enum: ["Laki-laki", "Perempuan"],
         required: [true, "Jenis kelamin tidak boleh kosong!"],
       },
-      phoneNumber: { type: Number, default: "" },
+      phoneNumber: { type: Number, default: 0 },
       // isVerified: {
       //   type: Boolean,
       //   default: true,
